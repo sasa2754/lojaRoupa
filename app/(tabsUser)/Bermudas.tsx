@@ -98,92 +98,31 @@ const styles = StyleSheet.create({
   }
 });
 
-interface Pijama {
+interface Bermuda {
   id: string,
   name: string,
   image: string,
   preco: string
 }
 
-export default function Pijama() {
-  const [pijama, setPijama] = useState<Pijama[]>([]);
-  const [newNamePijama, setNewNamePijama] = useState('');
-  const [newPrecoPijama, setNewPrecoPijama] = useState('');
-  const [newImagePijama, setNewImagePijama] = useState('');
+export default function Camiseta() {
+  const [bermuda, setBermuda] = useState<Bermuda[]>([]);
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(collection(FIREBASE_DB, "pijama"), (snapshop) => {
-      const pijamaList: Pijama[] = snapshop.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Pijama[];
-      setPijama(pijamaList);
+    const unsubscribe = onSnapshot(collection(FIREBASE_DB, "bermuda"), (snapshop) => {
+      const camisetaList: Bermuda[] = snapshop.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Bermuda[];
+      setBermuda(camisetaList);
     })
 
     return () => unsubscribe();
   }, []);
 
-  const add = async () => {
-    if (newNamePijama === "" && newNamePijama === "" && newPrecoPijama === "") {
-        Alert.alert("Por favor, insira um produto!");
-        return;
-    }
-    await addDoc(collection(FIREBASE_DB,"pijama"), { name: newNamePijama, image: newImagePijama, preco: newPrecoPijama });
-    setNewNamePijama('');
-    setNewPrecoPijama('');
-    setNewImagePijama('');
-  };
-
-  const deleteItem = async (id: string) => {
-    await deleteDoc(doc(FIREBASE_DB, "pijama", id));
-  };
-
-  const update = async (id: string) => {
-    if (newNamePijama === "" && newNamePijama === "" && newPrecoPijama === "") {
-      Alert.alert("Por favor, insira os dados para serem atualizados.");
-      return;
-    }
-
-    const userRef = doc(FIREBASE_DB, "pijama", id);
-
-    await updateDoc(userRef, {
-      name: newNamePijama,
-      image: newImagePijama,
-      preco: newPrecoPijama
-    });
-
-    setNewNamePijama('');
-    setNewPrecoPijama('');
-    setNewImagePijama('');
-  }
-
   return (
     <ScrollView style={styles.container}>
       <SafeAreaView>
-        <View>
-          <TextInput
-            style={styles.input}
-            placeholder="Nome do produto"
-            value={newNamePijama}
-            onChangeText={setNewNamePijama}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Link da imagem do produto"
-            value={newImagePijama}
-            onChangeText={setNewImagePijama}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Preço"
-            value={newPrecoPijama}
-            onChangeText={setNewPrecoPijama}
-          />
-          <TouchableOpacity style={styles.button} onPress={add}>
-            <Text style={styles.buttonText}>Adicionar</Text>
-          </TouchableOpacity>
-        </View>
-
         <View style={styles.table}>
           <FlatList
-            data={pijama}
+            data={bermuda}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
               
@@ -195,13 +134,10 @@ export default function Pijama() {
                 
                 <Text style={styles.price} numberOfLines={1} ellipsizeMode='tail'>R${item.preco}</Text>
                 
-                <TouchableOpacity onPress={() => update(item.id)}>
+                {/* <TouchableOpacity onPress={() => add(item.id)}>
                   <Text style={styles.updateButton}>Atualizar</Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
 
-                <TouchableOpacity onPress={() => deleteItem(item.id)}>
-                  <Text style={styles.deleteButton}>Excluir</Text>
-                </TouchableOpacity>
               </View>
 
             )}

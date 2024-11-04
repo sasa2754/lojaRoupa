@@ -79,7 +79,7 @@ export default function Login() {
         createUserWithEmailAndPassword(auth, email, pass)
             .then((dadosUsuario) => {
                 console.log(dadosUsuario);
-                router.push("/(tabs)");
+                router.push("/index.tsx");
             })
             .catch((err) => {
                 alert('Algo deu errado, tente novamente!');
@@ -100,11 +100,11 @@ export default function Login() {
                 <View style={{gap: 10, width: '90%', alignItems: 'center'}}>
                     <View style={styles.inputContainer}>
                         <Text style={{color: '#D3A832FF', fontSize: 18, fontFamily: 'Karla', fontWeight: 'bold'}}>Nome</Text>
-                        <TextInput style={styles.input} value={email} onChangeText={setEmail} />
+                        <TextInput style={styles.input} value={name} onChangeText={setName} />
                     </View>
                     <View style={styles.inputContainer}>
                         <Text style={{color: '#D3A832FF', fontSize: 18, fontFamily: 'Karla', fontWeight: 'bold'}}>Email</Text>
-                        <TextInput style={styles.input} value={name} onChangeText={setName} />
+                        <TextInput style={styles.input} value={email} onChangeText={setEmail} />
                     </View>
                     <View style={styles.inputContainer}>
                         <Text style={{color: '#D3A832FF', fontSize: 18, fontFamily: 'Karla', fontWeight: 'bold'}}>Senha</Text>

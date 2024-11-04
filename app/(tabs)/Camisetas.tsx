@@ -1,13 +1,14 @@
 import { FIREBASE_DB } from '@/firebaseConfig';
 import { addDoc, collection, deleteDoc, doc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
-import { Image, StyleSheet, Platform, Alert, View, TextInput, TouchableOpacity, FlatList, Text } from 'react-native';
+import { Image, StyleSheet, Platform, Alert, View, TextInput, TouchableOpacity, FlatList, Text, ScrollView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const styles = StyleSheet.create({
   container: {
       flex: 1,
       padding: 20,
-      backgroundColor: '#F7E5FFFF',
+      backgroundColor: '#F7F8D1FF',
       gap: 10
   },
 
@@ -21,12 +22,12 @@ const styles = StyleSheet.create({
   },
 
   button: {
-      backgroundColor: '#964BEBFF',
+      backgroundColor: '#EBCE4BFF',
       height: 40,
       justifyContent: 'center',
       alignItems: 'center',
       borderRadius: 5,
-      shadowColor: "#8C07C065",
+      shadowColor: "#AF972EFF",
       shadowOffset: {
           width: 0,
           height: 5,
@@ -34,15 +35,16 @@ const styles = StyleSheet.create({
       shadowOpacity: 1,
       shadowRadius: 4.65,
       elevation: 7,
+      marginVertical: 12
   },
 
   buttonText: {
-      color: '#fff',
+      color: '#5E4606FF',
       fontWeight: 'bold'
   },
 
-  userItem: {
-      flexDirection: 'row',
+  Item: {
+      flexDirection: 'column',
       justifyContent: 'space-between',
       alignItems: 'center',
       padding: 10,
@@ -51,11 +53,19 @@ const styles = StyleSheet.create({
   },
 
   deleteButton: {
-      color: 'red',
+    color: '#DA3416FF',
+    fontFamily: 'Karla',
+    fontWeight: 'bold',
+    fontSize: 16,
+    padding: 2
   },
 
   updateButton: {
-    color: 'blue',
+    color: '#DD710BFF',
+    fontFamily: 'Karla',
+    fontWeight: 'bold',
+    fontSize: 16,
+    padding: 2
   },
 
   id: {
@@ -63,95 +73,141 @@ const styles = StyleSheet.create({
   },
 
   table: {
-    borderColor: '#B430E9FF',
+    borderColor: '#E9BE30FF',
     borderWidth: 2,
     borderRadius: 6
   },
 
   name: {
-    maxWidth: 100
+    maxWidth: 300,
+    fontFamily: 'Puff',
+    fontSize: 17,
+    padding: 5
+  },
+
+  price: {
+    maxWidth: 300,
+    fontFamily: 'Karla',
+    fontSize: 17,
+    padding: 5
+  },
+
+  image: {
+    width: '90%',
+    borderRadius: 10
   }
 });
 
-interface User {
+interface Camiseta {
   id: string,
-  name: string
+  name: string,
+  image: string,
+  preco: string
 }
 
-export default function HomeScreen() {
-  const [users, setUsers] = useState<User[]>([]);
-  const [newUser, setNewUser] = useState('');
+export default function Camiseta() {
+  const [camiseta, setCamiseta] = useState<Camiseta[]>([]);
+  const [newNameCamiseta, setNewNameCamiseta] = useState('');
+  const [newPrecoCamiseta, setNewPrecoCamiseta] = useState('');
+  const [newImageCamiseta, setNewImageCamiseta] = useState('');
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(collection(FIREBASE_DB, "users"), (snapshop) => {
-      const userList: User[] = snapshop.docs.map(doc => ({ id: doc.id, ...doc.data() })) as User[];
-      setUsers(userList);
+    const unsubscribe = onSnapshot(collection(FIREBASE_DB, "camiseta"), (snapshop) => {
+      const camisetaList: Camiseta[] = snapshop.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Camiseta[];
+      setCamiseta(camisetaList);
     })
 
     return () => unsubscribe();
   }, []);
 
-  const addUser = async () => {
-    if (newUser === "") {
-        Alert.alert("Por favor, insira um nome.");
+  const add = async () => {
+    if (newNameCamiseta === "" && newNameCamiseta === "" && newPrecoCamiseta === "") {
+        Alert.alert("Por favor, insira um produto!");
         return;
     }
-    await addDoc(collection(FIREBASE_DB,"users"), { name: newUser });
-    setNewUser('');
+    await addDoc(collection(FIREBASE_DB,"camiseta"), { name: newNameCamiseta, image: newImageCamiseta, preco: newPrecoCamiseta });
+    setNewNameCamiseta('');
+    setNewPrecoCamiseta('');
+    setNewImageCamiseta('');
   };
 
-  const deleteUser = async (id: string) => {
-    await deleteDoc(doc(FIREBASE_DB, "users", id));
+  const deleteItem = async (id: string) => {
+    await deleteDoc(doc(FIREBASE_DB, "camiseta", id));
   };
 
-  const updateUser = async (id: string) => {
-    if (newUser === "") {
-      Alert.alert("Por favor, insira um novo nome para o usuário.");
+  const update = async (id: string) => {
+    if (newNameCamiseta === "" && newNameCamiseta === "" && newPrecoCamiseta === "") {
+      Alert.alert("Por favor, insira os dados para serem atualizados.");
       return;
     }
 
-    const userRef = doc(FIREBASE_DB, "users", id);
+    const userRef = doc(FIREBASE_DB, "camiseta", id);
 
     await updateDoc(userRef, {
-      name: newUser
+      name: newNameCamiseta,
+      image: newImageCamiseta,
+      preco: newPrecoCamiseta
     });
 
-    setNewUser('');
+    setNewNameCamiseta('');
+    setNewPrecoCamiseta('');
+    setNewImageCamiseta('');
   }
 
   return (
-    <View style={styles.container}>
-      <View>
-        <TextInput
+    <ScrollView style={styles.container}>
+      <SafeAreaView>
+        <View>
+          <TextInput
             style={styles.input}
-            placeholder="Novo Usuário"
-            value={newUser}
-            onChangeText={setNewUser}
-        />
-        <TouchableOpacity style={styles.button} onPress={addUser}>
+            placeholder="Nome do produto"
+            value={newNameCamiseta}
+            onChangeText={setNewNameCamiseta}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Link da imagem do produto"
+            value={newImageCamiseta}
+            onChangeText={setNewImageCamiseta}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Preço"
+            value={newPrecoCamiseta}
+            onChangeText={setNewPrecoCamiseta}
+          />
+          <TouchableOpacity style={styles.button} onPress={add}>
             <Text style={styles.buttonText}>Adicionar</Text>
-        </TouchableOpacity>
-      </View>
+          </TouchableOpacity>
+        </View>
 
-      <View style={styles.table}>
-        <FlatList
-            data={users}
+        <View style={styles.table}>
+          <FlatList
+            data={camiseta}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
-                <View style={styles.userItem}>
-                  <Text style={styles.id} numberOfLines={1} ellipsizeMode='tail'>{item.id}</Text>
-                    <Text style={styles.name} numberOfLines={1} ellipsizeMode='tail'>{item.name}</Text>
-                    <TouchableOpacity onPress={() => updateUser(item.id)}>
-                        <Text style={styles.updateButton}>Atualizar</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => deleteUser(item.id)}>
-                        <Text style={styles.deleteButton}>Excluir</Text>
-                    </TouchableOpacity>
-                </View>
-            )}
-        />
-      </View>
+              
+              <View style={styles.Item}>
+                
+                <img style={styles.image} src={item.image} alt={item.image} />
+                
+                <Text style={styles.name} numberOfLines={1} ellipsizeMode='tail'>{item.name}</Text>
+                
+                <Text style={styles.price} numberOfLines={1} ellipsizeMode='tail'>R${item.preco}</Text>
+                
+                <TouchableOpacity onPress={() => update(item.id)}>
+                  <Text style={styles.updateButton}>Atualizar</Text>
+                </TouchableOpacity>
 
-  </View>
+                <TouchableOpacity onPress={() => deleteItem(item.id)}>
+                  <Text style={styles.deleteButton}>Excluir</Text>
+                </TouchableOpacity>
+              </View>
+
+            )}
+          />
+        </View>
+      </SafeAreaView>
+    </ScrollView>
   );
 }
